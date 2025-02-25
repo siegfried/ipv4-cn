@@ -38,25 +38,17 @@
               cp $src/lib.r $out
             '';
           };
-          mainScript =
-            writeRscript "ipv4-cn-script" # r
+        in
+        {
+          inherit R;
+          default =
+            writeRscript "/bin/ipv4-cn" # r
               ''
                 source("${rLib}/lib.r")
                 args <- commandArgs(trailingOnly = TRUE)
                 name <- args[1]
                 fetch_data() |> save_ipv4_cn(name)
               '';
-        in
-        {
-          inherit R;
-          default = pkgs.stdenv.mkDerivation {
-            name = "ipv4-cn";
-            phases = [ "installPhase" ];
-            installPhase = ''
-              mkdir -p $out/bin
-              ln -s ${mainScript} $out/bin/ipv4-cn
-            '';
-          };
         }
       );
       devShells = forAllSystems (
